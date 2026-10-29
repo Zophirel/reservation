@@ -1,0 +1,31 @@
+{
+  "name": "directus-extension-sql-console",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "directus-extension build"
+  },
+  "dependencies": {
+    "@directus/extensions-sdk": "^17.0.0",
+    "@codemirror/autocomplete": "^6.20.4",
+    "@codemirror/lang-sql": "^6.10.0",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/view": "^6.38.1",
+    "codemirror": "^6.0.1",
+    "pgsql-ast-parser": "12.0.2"
+  },
+  "devDependencies": {},
+  "directus:extension": {
+    "type": "bundle",
+    "path": {
+      "app": "dist/app.js",
+      "api": "dist/api.js"
+    },
+    "entries": [
+      { "type": "module", "name": "sql-console-ui", "source": "src/module.ts" },
+      { "type": "endpoint", "name": "sql-console-api", "source": "src/endpoint.ts" }
+    ],
+    "host": "^11.0.0"
+  }
+}

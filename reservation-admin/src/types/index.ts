@@ -1,0 +1,13 @@
+export type Role = 'ADMIN' | 'CUSTOMER'
+export type User = { id: string; name: string; email: string; phoneNumber?: string | null; role: Role; status: 'ACTIVE' | 'DISABLED'; createdAt: string }
+export type Service = { id: string; name: string; description?: string | null; durationMinutes: number; enabled: boolean }
+export type Slot = { startAt: string; endAt: string; label: string }
+export type Reservation = { id: string; startAt: string; endAt: string; status: 'PENDING' | 'CONFIRMED' | 'CANCELLED'; calendarEventId?: string | null; calendarSyncStatus?: 'NOT_ATTEMPTED' | 'SYNCED' | 'FAILED' | 'DELETED' | 'NOT_CONFIGURED'; calendarSyncError?: string | null; calendarSyncedAt?: string | null; service: Service; user?: Pick<User, 'id' | 'name' | 'email'> }
+export type CalendarBusyEvent = { id: string; title: string; description?: string | null; location?: string | null; htmlLink?: string | null; allDay: boolean; startAt: string; endAt: string }
+export type Pagination = { page: number; pageSize: number; total: number; pageCount: number }
+export type Page<T> = { items: T[]; pagination: Pagination }
+export type Interval = { start: string; end: string }
+export type ScheduleDay = { id?: string; weekday: number; enabled: boolean; intervals: Interval[] }
+export type AvailabilityException = { id: string; date: string; type: 'DAY_OFF' | 'SPECIAL_HOURS'; reason?: string; intervals: Interval[] }
+export type Invitation = { id: string; type: 'ONE_TIME' | 'PERMANENT'; name?: string; email?: string; phoneNumber?: string; role: Role; description?: string; contactId?: string | null; contact?: { id: string; name: string; phoneNumber: string } | null; expiresAt?: string; usedAt?: string; revokedAt?: string; useCount: number; status: 'ACTIVE' | 'USED' | 'EXPIRED' | 'REVOKED'; url?: string }
+export type Settings = { businessName: string; timezone: string; slotIntervalMinutes: number; bookingWindow: 'WEEK' | 'MONTH' }

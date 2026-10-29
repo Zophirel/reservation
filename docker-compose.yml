@@ -1,0 +1,104 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: reservation
+      POSTGRES_USER: reservation
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in project .env}
+    ports:
+      - "5432:5432"
+    volumes:
+      - reservation_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reservation"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./reservation-backend
+    env_file:
+      - path: ./reservation-backend/.env
+        required: false
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://reservation:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in project .env}@postgres:5432/reservation?schema=public
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in project .env}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Administrator}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@example.com}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:?Set SEED_ADMIN_PASSWORD in project .env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    command: sh -c "npm run db:deploy && npm run db:seed && npm start"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  directus:
+    build:
+      context: ./directus
+    image: reservation-directus:local
+    environment:
+      KEY: ${DIRECTUS_KEY:?Set DIRECTUS_KEY in project .env}
+      SECRET: ${DIRECTUS_SECRET:?Set DIRECTUS_SECRET in project .env}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD:?Set DIRECTUS_ADMIN_PASSWORD in project .env}
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: reservation
+      DB_USER: reservation
+      DB_PASSWORD: reservation
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8055:8055"
+    volumes:
+      - directus_uploads:/directus/uploads
+
+  client:
+    build:
+      context: ./reservation-client
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+
+  admin:
+    build:
+      context: ./reservation-admin
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5174:80"
+
+  lan-nginx:
+    image: nginx:alpine
+    depends_on:
+      client:
+        condition: service_started
+      admin:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    ports:
+      - "${LAN_HTTP_PORT:-8080}:80"
+      - "${LAN_ADMIN_PORT:-8081}:81"
+      - "${LAN_HTTPS_PORT:-8443}:443"
+      - "${LAN_ADMIN_HTTPS_PORT:-8444}:444"
+    volumes:
+      - ./nginx-lan.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+
+volumes:
+  reservation_postgres:
+  directus_uploads:

@@ -1,0 +1,27 @@
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
+import { MoreHorizontal, Plus } from '@lucide/vue'
+import { toast } from 'vue-sonner'
+import { useI18n } from 'vue-i18n'
+import PageHeader from '@/components/layout/PageHeader.vue'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { api } from '@/services/api'
+import type { Page, Service } from '@/types'
+
+const items = ref<Service[]>([]); const dialog = ref(false); const selected = ref<Service | null>(null); const confirm = ref<Service | null>(null); const search = ref('')
+const { t } = useI18n()
+const form = reactive({ name: '', description: '', durationMinutes: 60, enabled: true })
+async function load() { items.value = (await api<Page<Service>>(`/admin/services?pageSize=100&search=${encodeURIComponent(search.value)}`)).items }
+function edit(service?: Service) { selected.value = service || null; Object.assign(form, service || { name: '', description: '', durationMinutes: 60, enabled: true }); dialog.value = true }
+async function save() { try { const path = selected.value ? `/admin/services/${selected.value.id}` : '/admin/services'; await api(path, { method: selected.value ? 'PUT' : 'POST', body: JSON.stringify(form) }); toast.success(selected.value ? t('services.updated') : t('services.created')); dialog.value = false; await load() } catch (error) { toast.error(error instanceof Error ? error.message : t('services.saveError')) } }
+async function toggle() { const service = confirm.value; if (!service) return; await api(`/admin/services/${service.id}/status`, { method: 'PATCH', body: JSON.stringify({ enabled: !service.enabled }) }); toast.success(service.enabled ? t('services.disabled') : t('services.enabled')); await load() }
+onMounted(load)
+</script>
+<template><PageHeader :title="t('nav.services')" :description="t('services.description')"><Button @click="edit()"><Plus />{{ t('services.add') }}</Button></PageHeader><div class="mb-4 flex gap-2"><Input v-model="search" class="max-w-sm" :placeholder="t('services.placeholder')" @keyup.enter="load" /><Button variant="outline" @click="load">{{ t('common.search') }}</Button></div><div class="rounded-xl border bg-card"><Table><TableHeader><TableRow><TableHead>{{ t('common.name') }}</TableHead><TableHead>{{ t('services.duration') }}</TableHead><TableHead>{{ t('common.status') }}</TableHead><TableHead class="w-12" /></TableRow></TableHeader><TableBody><TableRow v-for="service in items" :key="service.id"><TableCell><strong>{{ service.name }}</strong><p class="text-sm text-muted-foreground">{{ service.description }}</p></TableCell><TableCell>{{ service.durationMinutes }} min</TableCell><TableCell><Badge :variant="service.enabled ? 'default' : 'secondary'">{{ service.enabled ? t('common.active') : t('common.disabled') }}</Badge></TableCell><TableCell><DropdownMenu><DropdownMenuTrigger as-child><Button variant="ghost" size="icon"><MoreHorizontal /></Button></DropdownMenuTrigger><DropdownMenuContent align="end"><DropdownMenuItem @click="edit(service)">{{ t('services.edit') }}</DropdownMenuItem><DropdownMenuItem @click="confirm = service">{{ service.enabled ? t('services.disable') : t('services.enable') }}</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell></TableRow><TableRow v-if="!items.length"><TableCell colspan="4" class="h-32 text-center text-muted-foreground">{{ t('services.empty') }}</TableCell></TableRow></TableBody></Table></div><Dialog v-model:open="dialog"><DialogContent><DialogHeader><DialogTitle>{{ selected ? t('services.editTitle') : t('services.createTitle') }}</DialogTitle><DialogDescription>{{ t('services.dialogDescription') }}</DialogDescription></DialogHeader><form class="grid gap-4" @submit.prevent="save"><Label>{{ t('common.name') }}<Input v-model="form.name" required /></Label><Label>{{ t('common.description') }}<Input v-model="form.description" /></Label><Label>{{ t('services.durationMinutes') }}<Input v-model.number="form.durationMinutes" type="number" min="5" max="480" step="5" required /></Label><DialogFooter><Button type="button" variant="outline" @click="dialog = false">{{ t('common.cancel') }}</Button><Button>{{ t('services.save') }}</Button></DialogFooter></form></DialogContent></Dialog><AlertDialog :open="Boolean(confirm)" @update:open="(open) => { if (!open) confirm = null }"><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{{ confirm?.enabled ? t('services.disableTitle') : t('services.enableTitle') }}</AlertDialogTitle><AlertDialogDescription>{{ t('services.disableDescription') }}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>{{ t('common.cancel') }}</AlertDialogCancel><AlertDialogAction @click="toggle">{{ t('common.continue') }}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></template>

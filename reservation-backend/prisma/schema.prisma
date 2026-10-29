@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum InvitationType {
+  ONE_TIME
+  PERMANENT
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum CalendarSyncStatus {
+  NOT_ATTEMPTED
+  SYNCED
+  FAILED
+  DELETED
+  NOT_CONFIGURED
+}
+
+enum PushPlatform {
+  WEB
+}
+
+enum ExceptionType {
+  DAY_OFF
+  SPECIAL_HOURS
+}
+
+enum BookingWindow {
+  WEEK
+  MONTH
+}
+
+enum ContactSource {
+  DEVICE
+  GOOGLE
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phoneNumber  String?
+  passwordHash String
+  role         UserRole      @default(CUSTOMER)
+  status       UserStatus    @default(ACTIVE)
+  reservations Reservation[]
+  pushTokens   PushToken[]
+  importedContacts ExternalContact[]
+  matchedContacts ExternalContact[] @relation("MatchedContacts")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model ExternalContact {
+  id              String        @id @default(uuid())
+  source          ContactSource
+  externalId      String
+  name            String
+  phoneNumber     String
+  phoneNormalized String
+  importedById    String?
+  matchedUserId   String?
+  invitations     Invitation[]
+  importedBy      User?         @relation(fields: [importedById], references: [id], onDelete: SetNull)
+  matchedUser     User?         @relation("MatchedContacts", fields: [matchedUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([source, externalId])
+  @@index([phoneNormalized])
+  @@index([matchedUserId])
+}
+
+model Invitation {
+  id             String         @id @default(uuid())
+  type           InvitationType
+  name           String?
+  email          String?
+  phoneNumber    String?
+  role           UserRole       @default(CUSTOMER)
+  description    String?
+  contactId      String?
+  tokenHash      String         @unique
+  tokenEncrypted String
+  expiresAt      DateTime?
+  usedAt         DateTime?
+  revokedAt      DateTime?
+  useCount       Int            @default(0)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  contact        ExternalContact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([contactId])
+}
+
+model Service {
+  id              String        @id @default(uuid())
+  name            String
+  description     String?
+  durationMinutes Int
+  enabled         Boolean       @default(true)
+  reservations    Reservation[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model WeeklyAvailability {
+  id        String   @id @default(uuid())
+  weekday   Int      @unique
+  enabled   Boolean  @default(false)
+  intervals Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AvailabilityException {
+  id        String        @id @default(uuid())
+  date      DateTime      @unique @db.Date
+  type      ExceptionType
+  reason    String?
+  intervals Json
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Reservation {
+  id          String            @id @default(uuid())
+  userId      String
+  serviceId   String
+  startAt     DateTime
+  endAt       DateTime
+  status      ReservationStatus @default(PENDING)
+  cancelledAt DateTime?
+  calendarEventId   String?
+  calendarSyncStatus CalendarSyncStatus @default(NOT_ATTEMPTED)
+  calendarSyncError  String?
+  calendarSyncedAt   DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User              @relation(fields: [userId], references: [id])
+  service     Service           @relation(fields: [serviceId], references: [id])
+
+  @@index([startAt, endAt])
+  @@index([userId, startAt])
+}
+
+model PushToken {
+  id        String       @id @default(uuid())
+  userId    String
+  token     String       @unique
+  platform  PushPlatform @default(WEB)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model BusinessSettings {
+  id                  String   @id @default("default")
+  businessName        String   @default("Reservio")
+  timezone            String   @default("Europe/Rome")
+  slotIntervalMinutes Int      @default(30)
+  bookingWindow       BookingWindow @default(MONTH)
+  updatedAt           DateTime @updatedAt
+}
+
+model CalendarSyncState {
+  id           String    @id @default("google")
+  calendarId   String
+  syncToken    String?
+  lastSyncedAt DateTime?
+  lastError    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model GoogleOAuthCredential {
+  id                    String   @id
+  refreshTokenEncrypted String
+  updatedAt             DateTime @updatedAt
+}

@@ -1,0 +1,6 @@
+{
+  "appId": "com.reservio.app",
+  "appName": "Reservio",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" }
+}

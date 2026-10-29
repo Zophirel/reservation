@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="it"><head><meta charset="utf-8"><title>Collegamento Google</title></head><body>
+<p>Completamento del collegamento Google…</p>
+<script>
+  if (window.opener) {
+    const params = new URLSearchParams(window.location.search)
+    window.opener.postMessage({ type: 'reservio-google-oauth', code: params.get('code'), state: params.get('state'), error: params.get('error') }, window.location.origin)
+    window.close()
+  } else document.querySelector('p').textContent = 'Puoi chiudere questa finestra.'
+</script>
+</body></html>

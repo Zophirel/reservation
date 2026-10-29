@@ -1,0 +1,58 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+**/certs/
+**/secrets/
+credentials.json
+service-account*.json
+
+# Dependencies
+node_modules/
+vendor/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Generated frontend/backend artifacts
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.turbo/
+.cache/
+coverage/
+*.tsbuildinfo
+
+# Docker runtime and persistent data
+**/postgres-data/
+**/pgdata/
+**/uploads/
+**/storage/
+**/data/*.sqlite*
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz
+*.dump
+
+# Logs and local tools
+*.log
+logs/
+tmp/
+temp/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

@@ -14,7 +14,6 @@ const props = defineProps<{
   minValue: DateValue
   maxValue?: DateValue
   availableDates: string[]
-  availableDatesMonth: string
   services: Service[]
   selectedService: Service | null
   selectedSlot: Slot | null
@@ -82,9 +81,6 @@ function selectSlot(slot: Slot) {
 
 function isDateDisabled(date: DateValue) {
   const dateString = date.toString()
-  const month = props.visibleMonth.toString().slice(0, 7)
-  if (dateString.slice(0, 7) !== month) return true
-  if (props.availableDatesMonth !== month) return true
   return !availableDateSet.value.has(dateString)
 }
 </script>
@@ -102,7 +98,6 @@ function isDateDisabled(date: DateValue) {
             :min-value="minValue"
             :max-value="maxValue"
             :is-date-disabled="isDateDisabled"
-            disable-days-outside-current-view
             class="mx-auto w-full max-w-2xl p-1 [&_[data-slot=calendar-cell-trigger]]:mx-auto [&_[data-slot=calendar-cell-trigger]]:size-10 [&_[data-slot=calendar-cell-trigger]]:text-sm [&_[data-slot=calendar-grid-row]]:mt-2 [&_[data-slot=calendar-head-cell]]:text-xs [&_[data-slot=calendar-heading]]:text-base sm:[&_[data-slot=calendar-cell-trigger]]:size-12 sm:[&_[data-slot=calendar-cell-trigger]]:text-base sm:[&_[data-slot=calendar-grid-row]]:mt-3 sm:[&_[data-slot=calendar-head-cell]]:text-sm lg:[&_[data-slot=calendar-cell-trigger]]:size-16 lg:[&_[data-slot=calendar-cell-trigger]]:text-lg lg:[&_[data-slot=calendar-grid-row]]:mt-5 lg:[&_[data-slot=calendar-head-cell]]:text-base lg:[&_[data-slot=calendar-heading]]:text-xl"
           />
           <div class="booking-calendar-footer flex items-center justify-between border-t px-5 py-3 text-[10px] text-muted-foreground lg:border-t-0">

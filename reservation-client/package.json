@@ -18,6 +18,9 @@
   "dependencies": {
     "@capacitor-community/contacts": "^7.2.0",
     "@capacitor/core": "^7.0.0",
+    "@fullcalendar/core": "^6.1.22",
+    "@fullcalendar/daygrid": "^6.1.22",
+    "@fullcalendar/vue3": "^6.1.22",
     "@lucide/vue": "^1.47.0",
     "@vueuse/core": "^15.0.0",
     "class-variance-authority": "^0.7.1",

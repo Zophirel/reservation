@@ -94,7 +94,7 @@ h1, h2, h3, .brand { font-family: 'Plus Jakarta Sans', sans-serif; }
 .auth-page { display: grid; grid-template-columns: minmax(360px, 44%) 1fr; min-height: 100vh; }
 .auth-intro { position: relative; display: flex; flex-direction: column; justify-content: space-between; min-height: 100vh; padding: 48px 60px; overflow: hidden; color: white; background: #000; }
 .auth-intro::after { content: ''; position: absolute; right: -18%; bottom: -15%; width: 420px; height: 420px; border: 1px solid rgba(255,255,255,.12); border-radius: 50%; box-shadow: 0 0 0 65px rgba(255,255,255,.025), 0 0 0 130px rgba(255,255,255,.02); }
-.brand-light .brand-mark { background: white; color: var(--forest); }
+.brand-light .brand-mark { background: white; --brand-mark-foreground: #151c27; }
 .intro-copy { position: relative; z-index: 1; max-width: 520px; }
 .intro-copy .eyebrow { color: #b9c9b9; }
 .intro-copy h1 { margin-bottom: 24px; font-size: clamp(40px, 5vw, 64px); line-height: 1.12; letter-spacing: -.03em; }
@@ -175,7 +175,7 @@ input:disabled { color: #8b918d; background: #f2f2ee; }
 .booking-service-option { gap: 10px; border-color: #e1e3df; border-radius: 9px; background: #fff; }
 .booking-service-option:hover { border-color: #b8c0b8; background: #fff; }
 .booking-service-icon { display: inline-grid; flex-shrink: 0; place-items: center; width: 32px; height: 32px; border-radius: 8px; color: #151c27; background: #f0f3ff; }
-.booking-selected-service { border: 1px solid #e1e3df; border-radius: 9px; padding: 8px 9px; background: #fff; }
+.booking-selected-service { border: 1px solid #e1e3df; border-radius: 9px; padding: 12px; background: #fff; }
 .booking-time-groups { display: grid; gap: 18px; }
 .booking-time-group-label { margin-bottom: 8px; }
 .booking-time-option { min-height: 40px; border-color: #e9ecef; border-radius: 8px; background: #fff; font-size: 12px; }
@@ -189,9 +189,9 @@ input:disabled { color: #8b918d; background: #f2f2ee; }
 .booking-benefit-card p:first-child { margin-bottom: 3px; font-size: 11px; }
 .booking-benefit-card p:last-child { font-size: 10px; }
 .profile-page { display: grid; gap: 16px; max-width: 720px; margin: 0 auto; }
-.profile-hero-card, .upcoming-card, .preferences-card, .settings-list, .reservations-history-card { border-color: #e9ecef; border-radius: 16px; background: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, .03); }
+.profile-hero-card, .upcoming-card, .settings-list, .reservations-history-card { border-color: #e9ecef; border-radius: 16px; background: #fff; box-shadow: 0 4px 20px rgba(0, 0, 0, .03); }
 .profile-hero-card { padding: 16px; }
-.profile-hero-top, .profile-identity, .profile-status-bar, .profile-section-heading, .upcoming-top, .upcoming-location, .preference-row, .settings-row { display: flex; align-items: center; }
+.profile-hero-top, .profile-identity, .profile-status-bar, .profile-section-heading, .upcoming-top, .upcoming-location, .settings-row { display: flex; align-items: center; }
 .profile-hero-top, .profile-section-heading, .upcoming-top { justify-content: space-between; gap: 12px; }
 .profile-identity { min-width: 0; gap: 12px; }
 .profile-avatar { width: 56px; height: 56px; border: 2px solid #fff; color: #fff; background: #000; box-shadow: 0 0 0 1px #e9ecef; }
@@ -228,26 +228,14 @@ input:disabled { color: #8b918d; background: #f2f2ee; }
 .empty-upcoming { place-items: center; text-align: center; }
 .empty-upcoming p { margin: 0; color: #6b7280; font-size: 13px; }
 .profile-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.profile-stats .card { display: grid; min-height: 96px; place-items: center; align-content: center; gap: 4px; border-color: #e9ecef; border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, .02); }
+.profile-stats > [data-slot="card"] { display: grid; min-height: 96px; place-items: center; align-content: center; gap: 4px; border-color: #e9ecef; border-radius: 12px; padding: 12px 8px; text-align: center; box-shadow: 0 2px 10px rgba(0, 0, 0, .02); }
 .profile-stats span { color: #444748; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 .profile-stats strong { max-width: 100%; overflow: hidden; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
 .profile-stats small { color: #00714d; font-size: 10px; }
-.preferences-card { display: grid; gap: 8px; padding: 16px; }
 .profile-card-label { margin: 0 0 2px; color: #444748; font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-.preference-row { width: 100%; gap: 10px; border: 0; border-radius: 9px; padding: 10px; text-align: left; background: rgba(240, 243, 255, .72); }
-.preference-row:hover { background: #e7eefe; }
-.preference-icon, .settings-icon { display: grid; flex-shrink: 0; place-items: center; color: #151c27; background: #e2e8f8; }
-.preference-icon { width: 36px; height: 36px; border-radius: 50%; }
-.preference-icon--positive { color: #00714d; background: #c8f9e2; }
-.preference-copy { display: grid; min-width: 0; flex: 1; gap: 2px; }
-.preference-copy strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
-.preference-copy small { overflow: hidden; color: #6b7280; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.preference-toggle { display: flex; flex-shrink: 0; align-items: center; justify-content: flex-start; width: 40px; height: 24px; border-radius: 999px; padding: 2px; background: #c4c7c7; transition: background .2s ease; }
-.preference-toggle i { display: block; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .2); transition: transform .2s ease; }
-.preference-toggle--on { justify-content: flex-end; background: #000; }
-.profile-visual-tile { min-height: 112px; border-radius: 16px; background: #dce2f3; }
+.settings-icon { display: grid; flex-shrink: 0; place-items: center; color: #151c27; background: #e2e8f8; }
 .profile-settings { display: grid; gap: 8px; }
-.settings-list { display: grid; overflow: hidden; }
+.settings-list { display: grid; gap: 0; overflow: hidden; padding: 0; }
 .settings-row { width: 100%; min-height: 60px; gap: 12px; border: 0; border-bottom: 1px solid #e9ecef; padding: 10px 16px; color: #151c27; background: #fff; text-align: left; font-size: 14px; }
 .settings-row:last-child { border-bottom: 0; }
 .settings-row:hover { background: #f0f3ff; }
@@ -256,7 +244,11 @@ input:disabled { color: #8b918d; background: #f2f2ee; }
 .settings-icon { width: 32px; height: 32px; border-radius: 8px; }
 .settings-row--logout { color: #ba1a1a; }
 .settings-row--logout .settings-icon { color: #ba1a1a; background: #ffdad6; }
-.reservations-history-card { padding: 20px; }
+.reservations-history-card { min-width: 0; gap: 0; padding: 20px; }
+.reservations-history-card .section-title { margin-bottom: 8px; }
+.calendar-hint { margin: 0 0 16px; color: #6b7280; font-size: 12px; }
+.profile-avatar [data-slot="avatar-fallback"] { color: #fff; background: #111827; }
+.empty-upcoming a { color: #fff; }
 .calendar-card { padding: 28px; }
 .calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 27px; }
 .calendar-header h2 { margin: 0; font-size: 21px; letter-spacing: -.025em; }
@@ -343,3 +335,58 @@ input:disabled { color: #8b918d; background: #f2f2ee; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
 }
+
+.reservation-calendar-detail { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; padding: 15px; border: 1px solid #e9ecef; border-radius: 12px; }
+.reservation-calendar-detail strong { font-size: 14px; }
+.reservation-calendar-detail p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+
+:root.dark {
+  color: #edf1f7; background: #101319; --brand-mark-foreground: #101319;
+  --ink: #edf1f7; --forest: #dce9e2; --cream: #101319; --line: #343c48; --muted: #a5afbd; --white: #202630;
+  --background: #101319; --foreground: #edf1f7; --card: #1b212a; --card-foreground: #edf1f7;
+  --popover: #222a34; --popover-foreground: #edf1f7; --primary: #e7f5ec; --primary-foreground: #132019;
+  --secondary: #2a3442; --secondary-foreground: #edf1f7; --ui-muted: #2a313b; --muted-foreground: #a5afbd;
+  --accent: #263c35; --accent-foreground: #a3efc9; --destructive: #ff9a92; --border: #343c48; --input: #46505e; --ring: #94b5a3;
+  --sidebar: #1b212a; --sidebar-foreground: #edf1f7; --sidebar-primary: #e7f5ec; --sidebar-primary-foreground: #132019;
+  --sidebar-accent: #2a3442; --sidebar-accent-foreground: #edf1f7; --sidebar-border: #343c48; --sidebar-ring: #94b5a3;
+}
+.dark .shell { background: var(--background); }
+.dark .topbar, .dark .header-divider { border-color: var(--border); }
+.dark .header-divider { background: var(--border); }
+.dark .account-link, .dark .header-business-name, .dark .eyebrow, .dark label { color: var(--muted-foreground); }
+.dark input { color: var(--foreground); background: #222a34; border-color: var(--input); }
+.dark input:disabled { color: #a5afbd; background: #272e38; }
+.dark .primary-button { color: var(--primary-foreground); background: var(--primary); }
+.dark .secondary-button { color: var(--foreground); background: var(--card); border-color: var(--border); }
+.dark .booking-calendar-pane, .dark .booking-selection-panel, .dark .profile-hero-card, .dark .upcoming-card, .dark .settings-list, .dark .reservations-history-card, .dark .booking-service-option, .dark .booking-selected-service, .dark .booking-time-option, .dark .booking-benefit-card, .dark .profile-stats > [data-slot='card'] { color: var(--card-foreground); background: var(--card); border-color: var(--border); }
+.dark .booking-selection-panel, .dark .booking-selection-footer { background: #171c23; }
+.dark .booking-selection-panel > .border-b, .dark .booking-selection-footer, .dark .booking-calendar-footer { border-color: var(--border); }
+.dark .booking-selection-footer > div { color: var(--foreground); background: #29343d; border-color: var(--border); }
+.dark .booking-service-option:hover, .dark .booking-time-option:hover, .dark .settings-row:hover { background: #2d3745; border-color: #52606e; }
+.dark .booking-service-icon, .dark .profile-edit-button, .dark .settings-icon, .dark .profile-status-bar, .dark .upcoming-service { color: var(--foreground); background: #303c4b; }
+.dark .booking-calendar-pane [data-slot='calendar-cell-trigger'][data-selected='true'] { color: var(--primary-foreground); background: var(--primary); box-shadow: 0 0 0 2px var(--card), 0 0 0 3px var(--primary); }
+.dark .booking-legend-dot--selected { background: var(--primary); }
+.dark .booking-legend-dot--available { background: #85909b; }
+.dark .booking-time-option[data-state='on'], .dark .booking-time-option.bg-primary { color: var(--primary-foreground); border-color: var(--primary); background: var(--primary); }
+.dark .profile-status-bar small, .dark .profile-identity-copy p, .dark .upcoming-service p, .dark .upcoming-location, .dark .upcoming-top > span, .dark .profile-stats span, .dark .profile-card-label, .dark .calendar-hint, .dark .profile-phone { color: var(--muted-foreground); }
+.dark .profile-status-bar, .dark .settings-row { color: var(--foreground); }
+.dark .settings-row { background: var(--card); border-color: var(--border); }
+.dark .settings-row--logout, .dark .settings-row--logout .settings-icon { color: #ff9a92; }
+.dark .settings-row--logout .settings-icon { background: #512c32; }
+.dark .confirmed-badge { color: #b6f2ce; background: #27503f; }
+.dark .upcoming-datetime b, .dark .profile-section-heading > span, .dark .profile-stats small, .dark .profile-status-bar span svg { color: #95e5b8; }
+.dark .empty-upcoming a { color: var(--primary-foreground); }
+.dark .reservation-calendar-detail, .dark .profile-edit-form { border-color: var(--border); }
+.dark .section-title > span { color: var(--primary-foreground); background: var(--primary); }
+.dark .bottom-nav { background: rgba(28, 34, 43, .96); border-color: var(--border); }
+.dark .bottom-nav a, .dark .bottom-nav button { color: #a5afbd; }
+.dark .bottom-nav a.router-link-active { color: var(--primary-foreground); background: var(--primary); }
+.dark .bottom-nav button:last-child { color: #ff9a92; }
+@media (max-width: 480px) { .header-actions { gap: 2px; } .topbar { padding-inline: 12px; } }
+
+.dark .reservation-calendar .calendar-toolbar, .dark .reservation-calendar .calendar-shell { border-color: var(--border); }
+.dark .reservation-calendar .calendar-shell { --fc-border-color: var(--border); --fc-neutral-bg-color: var(--ui-muted); }
+.dark .reservation-calendar .calendar-shell .fc-col-header-cell-cushion, .dark .reservation-calendar .calendar-shell .fc-daygrid-day-number, .dark .reservation-calendar .calendar-shell .fc-more-link { color: var(--foreground); }
+.dark .reservation-calendar .calendar-shell .fc-day-other { background: #232a34; }
+.dark .reservation-calendar .calendar-shell .fc-popover { background: var(--popover); color: var(--popover-foreground); border-color: var(--border); }
+.dark .reservation-calendar .day-number--today { color: var(--primary-foreground); background: var(--primary); }

@@ -19,11 +19,13 @@ const store = useReservationStore()
 const { t } = useI18n()
 const selectedService = ref<Service | null>(null); const selectedDate = shallowRef<DateValue>(); const selectedSlot = ref<Slot | null>(null); const businessName = ref('')
 const slots = ref<Slot[]>([]); const loading = ref(true); const loadingSlots = ref(false); const confirming = ref(false); const dialogOpen = ref(false)
-const visibleMonth = shallowRef<DateValue>(today(getLocalTimeZone())); const availableDates = ref<string[]>([]); const availableDatesMonth = ref(''); const bookingFromDate = ref<DateValue>(); const bookingToDate = ref<DateValue>()
+const visibleMonth = shallowRef<DateValue>(today(getLocalTimeZone())); const availableDates = ref<string[]>([]); const bookingFromDate = ref<DateValue>(); const bookingToDate = ref<DateValue>()
 const bookingMinDate = computed(() => { const currentDate = today(getLocalTimeZone()); return bookingFromDate.value && bookingFromDate.value.compare(currentDate) > 0 ? bookingFromDate.value : currentDate })
 const dateString = computed(() => selectedDate.value?.toString() || '')
 let availabilityRefreshPoll: number | null = null
 let slotsRequestSequence = 0
+let datesRequestSequence = 0
+let datesLoading = false
 let silentSlotsRefreshInFlight = false
 onMounted(async () => {
   try { const [settings] = await Promise.all([api<{ settings: { businessName: string; bookingFromDate: string | null; bookingToDate: string | null } }>('/settings/public'), store.loadServices()]); businessName.value = settings.settings.businessName; bookingFromDate.value = settings.settings.bookingFromDate ? parseDate(settings.settings.bookingFromDate.slice(0, 10)) : undefined; bookingToDate.value = settings.settings.bookingToDate ? parseDate(settings.settings.bookingToDate.slice(0, 10)) : undefined; if (bookingFromDate.value && visibleMonth.value.compare(bookingFromDate.value) < 0) visibleMonth.value = bookingFromDate.value } catch { toast.error(t('booking.servicesError')) } finally { loading.value = false }
@@ -36,7 +38,21 @@ onBeforeUnmount(() => {
 })
 watch([selectedService, dateString], () => { void loadSlots() })
 watch(() => visibleMonth.value.toString().slice(0, 7), () => { void loadAvailableDates() }, { immediate: true })
-async function loadAvailableDates(silent = false) { const month = visibleMonth.value.toString().slice(0, 7); if (!silent) availableDatesMonth.value = ''; try { availableDates.value = await store.getAvailableDates(month); availableDatesMonth.value = month } catch { if (!silent) { availableDates.value = []; toast.error(t('booking.availabilityError')) } } }
+async function loadAvailableDates(silent = false) {
+  if (silent && datesLoading) return
+  if (!silent) datesLoading = true
+  const month = visibleMonth.value.set({ day: 1 })
+  const months = [month.subtract({ months: 1 }), month, month.add({ months: 1 })].map((date) => date.toString().slice(0, 7))
+  const requestSequence = ++datesRequestSequence
+  if (!silent) availableDates.value = []
+  const results = await Promise.allSettled(months.map((value) => store.getAvailableDates(value)))
+  if (requestSequence !== datesRequestSequence) return
+  if (!silent) datesLoading = false
+  const failed = results.some((result) => result.status === 'rejected')
+  if (silent && failed) return
+  availableDates.value = results.flatMap((result) => result.status === 'fulfilled' ? result.value : [])
+  if (failed && !silent) toast.error(t('booking.availabilityError'))
+}
 async function loadSlots(preserveSelection = false, silent = false) {
   const serviceId = selectedService.value?.id
   const requestedDate = dateString.value
@@ -94,7 +110,6 @@ async function confirmBooking() { if (!selectedService.value || !selectedSlot.va
         :min-value="bookingMinDate"
         :max-value="bookingToDate"
         :available-dates="availableDates"
-        :available-dates-month="availableDatesMonth"
         :services="store.services"
         :slots="slots"
         :loading-services="loading"

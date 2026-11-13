@@ -14,7 +14,7 @@
   height: 29px;
   padding: 5px;
   border-radius: 9px;
-  color: var(--brand-mark-foreground, white);
+  color: white;
   background: var(--ink);
 }
 

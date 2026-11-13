@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB: reservation
       POSTGRES_USER: reservation
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in project .env}
+      POSTGRES_PASSWORD: reservation
     ports:
       - "5432:5432"
     volumes:
@@ -23,11 +23,11 @@ services:
         required: false
     environment:
       PORT: 3000
-      DATABASE_URL: postgresql://reservation:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in project .env}@postgres:5432/reservation?schema=public
-      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in project .env}
+      DATABASE_URL: postgresql://reservation:reservation@postgres:5432/reservation?schema=public
+      AUTH_SECRET: ${AUTH_SECRET:-change-this-development-secret}
       SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Administrator}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@example.com}
-      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:?Set SEED_ADMIN_PASSWORD in project .env}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-change-me-now}
     depends_on:
       postgres:
         condition: service_healthy
@@ -45,10 +45,10 @@ services:
       context: ./directus
     image: reservation-directus:local
     environment:
-      KEY: ${DIRECTUS_KEY:?Set DIRECTUS_KEY in project .env}
-      SECRET: ${DIRECTUS_SECRET:?Set DIRECTUS_SECRET in project .env}
+      KEY: ${DIRECTUS_KEY:-development-directus-key-change-this}
+      SECRET: ${DIRECTUS_SECRET:-development-directus-secret-change-this}
       ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL:-admin@example.com}
-      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD:?Set DIRECTUS_ADMIN_PASSWORD in project .env}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD:-change-me-now}
       DB_CLIENT: pg
       DB_HOST: postgres
       DB_PORT: 5432
